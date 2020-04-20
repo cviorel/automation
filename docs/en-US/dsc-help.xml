@@ -1,0 +1,463 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>New-AddressConfig</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>AddressConfig</command:noun>
+      <maml:description>
+        <maml:para>Helper function that creates a formatted Base64 string.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Helper function that creates a formatted Base64 string used by the New-RemoteRestrictions function.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-AddressConfig</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>Index</maml:name>
+          <maml:Description>
+            <maml:para>Use this parameter to specify if all connections are denied by default or not. Example: 0 Required: False Type: Int Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>IP</maml:name>
+          <maml:Description>
+            <maml:para>IP address in dotted-quad format. Example: '192.168.0.1' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>Subnet</maml:name>
+          <maml:Description>
+            <maml:para>Subnet mask in dotted-quad format. Example: '255.255.0.0' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>Allow</maml:name>
+          <maml:Description>
+            <maml:para>A boolean value that specifies if global connections are allowed or not. Example: $true Required: False Type: Bool Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Boolean</command:parameterValue>
+          <dev:type>
+            <maml:name>Boolean</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>Allow</maml:name>
+        <maml:Description>
+          <maml:para>A boolean value that specifies if global connections are allowed or not. Example: $true Required: False Type: Bool Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Boolean</command:parameterValue>
+        <dev:type>
+          <maml:name>Boolean</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>Index</maml:name>
+        <maml:Description>
+          <maml:para>Use this parameter to specify if all connections are denied by default or not. Example: 0 Required: False Type: Int Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>IP</maml:name>
+        <maml:Description>
+          <maml:para>IP address in dotted-quad format. Example: '192.168.0.1' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>Subnet</maml:name>
+        <maml:Description>
+          <maml:para>Subnet mask in dotted-quad format. Example: '255.255.0.0' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Author: Mike Nickerson</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>New-AddressConfig -Index 0 -IP "10.0.0.1" -Subnet "255.0.0.0" -Allow $false</dev:code>
+        <dev:remarks>
+          <maml:para>Creates the IP/subnet configuration for a Base64 string that can be used by the New-RemoteRestrictions function.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>New-IporSubnetString</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>IporSubnetString</command:noun>
+      <maml:description>
+        <maml:para>Helper function that creates a Base64 string.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Helper function that creates a Base64 string based on a template text string.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-IporSubnetString</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>IP</maml:name>
+          <maml:Description>
+            <maml:para>IP address in dotted-quad format. Example: '192.168.0.1' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>IPTemplateString</maml:name>
+          <maml:Description>
+            <maml:para>A text string that sets the format for the Base64 string produced by the function. Example: 'AwEDAQMBAwEC' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>IPOffset</maml:name>
+          <maml:Description>
+            <maml:para>Helps set the format for the Base64 string. Example: 1 Required: False Type: Int Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>IP</maml:name>
+        <maml:Description>
+          <maml:para>IP address in dotted-quad format. Example: '192.168.0.1' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>IPOffset</maml:name>
+        <maml:Description>
+          <maml:para>Helps set the format for the Base64 string. Example: 1 Required: False Type: Int Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>IPTemplateString</maml:name>
+        <maml:Description>
+          <maml:para>A text string that sets the format for the Base64 string produced by the function. Example: 'AwEDAQMBAwEC' Required: False Type: String Parameter Sets: All Position: Named Default Value: none Accept pipeline input: False Accept wildcard characters: False</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Author: Mike Nickerson</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>$IP = "10.0.0.0"</dev:code>
+        <dev:remarks>
+          <maml:para>PS C:\&gt; $IPTemplate = "AwEDAQMBAwEC" PS C:\&gt; New-IPorSubnetString -IP $IP -IPTemplateString $IPTemplate -IPOffset 1</maml:para>
+          <maml:para>Creates a Base64 string using the provided template string and IP address.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>New-RemoteRestriction</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>RemoteRestriction</command:noun>
+      <maml:description>
+        <maml:para>Generates the RemoteRestrictions registry value for IIS remote management.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Generates a Base64 value for the RemoteRestrictions registry value used to set HKLM\SOFTWARE\Microsoft\WebManagement\Server\RemoteRestrictions to a set of allowed/denied IP addresses. Use this script to generate a base64 string to use in a DSC configuration script that will be used to configure an IIS web server.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-RemoteRestriction</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>GlobalDeny</maml:name>
+          <maml:Description>
+            <maml:para>Use this parameter to specify if all connections are denied by default or not.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Boolean</command:parameterValue>
+          <dev:type>
+            <maml:name>Boolean</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>Addresses</maml:name>
+          <maml:Description>
+            <maml:para>A string array consisting of an IP address/subnet mask value that can specify a single IP address or subnet of IP addresses.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>Addresses</maml:name>
+        <maml:Description>
+          <maml:para>A string array consisting of an IP address/subnet mask value that can specify a single IP address or subnet of IP addresses.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>GlobalDeny</maml:name>
+        <maml:Description>
+          <maml:para>Use this parameter to specify if all connections are denied by default or not.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Boolean</command:parameterValue>
+        <dev:type>
+          <maml:name>Boolean</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Author: Mike Nickerson</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>New-RemoteRestriction -GlobalDeny $True -Addresses "1.1.1.1/255.255.255.255"</dev:code>
+        <dev:remarks>
+          <maml:para>Globally deny access and only allow connections from a specific IP address.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>New-RemoteRestriction -GlobalDeny $True -Addresses "1.1.1.0/255.255.255.0", "2.2.2.0/255.255.255.0"</dev:code>
+        <dev:remarks>
+          <maml:para>Globally deny access and only allow connections from two specified subnets.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>New-RemoteRestriction -GlobalDeny $False -Addresses "1.1.1.0/255.255.255.0", "2.2.2.0/255.255.255.0"</dev:code>
+        <dev:remarks>
+          <maml:para>Globally allow access and deny 2 ips and subnets</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>https://docs.microsoft.com/en-us/powershell/</maml:linkText>
+        <maml:uri>https://docs.microsoft.com/en-us/powershell/</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Publish-DscModuleAndMof</command:name>
+      <command:verb>Publish</command:verb>
+      <command:noun>DscModuleAndMof</command:noun>
+      <maml:description>
+        <maml:para>Package DSC modules and mof configuration document and publish them on an enterprise DSC pull server in the required format.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Uses Publish-DscModulesAndMof function to package DSC modules into zip files with the version info. Publishes the zip modules on "$env:ProgramFiles\WindowsPowerShell\DscService\Modules". Publishes all mof configuration documents that are present in the $Source folder on "$env:ProgramFiles\WindowsPowerShell\DscService\Configuration"- Use $Force to overwrite the version of the module that exists in the PowerShell module path with the version from the $source folder. Use $ModuleNameList to specify the names of the modules to be published if the modules do not exist in $Source folder.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Publish-DscModuleAndMof</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>Source</maml:name>
+          <maml:Description>
+            <maml:para>The folder that contains the configuration mof documents and modules to be published on Pull server. Everything in this folder will be packaged and published.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>ModuleNameList</maml:name>
+          <maml:Description>
+            <maml:para>Package and publish the modules listed in $ModuleNameList based on PowerShell module path content.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Force</maml:name>
+          <maml:Description>
+            <maml:para>Switch to overwrite the module in PSModulePath with the version provided in $Sources.</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Force</maml:name>
+        <maml:Description>
+          <maml:para>Switch to overwrite the module in PSModulePath with the version provided in $Sources.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>ModuleNameList</maml:name>
+        <maml:Description>
+          <maml:para>Package and publish the modules listed in $ModuleNameList based on PowerShell module path content.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>Source</maml:name>
+        <maml:Description>
+          <maml:para>The folder that contains the configuration mof documents and modules to be published on Pull server. Everything in this folder will be packaged and published.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>Publish-DscModuleAndMof -Source C:\LocalDepot -ModuleNameList @("xWebAdministration", "xPhp")</dev:code>
+        <dev:remarks>
+          <maml:para>Packages and publishes the specified modules.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>https://docs.microsoft.com/en-us/powershell/</maml:linkText>
+        <maml:uri>https://docs.microsoft.com/en-us/powershell/</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+</helpItems>

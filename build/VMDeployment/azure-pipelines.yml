@@ -1,0 +1,105 @@
+# build Pipeline
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - dev
+      - master
+
+stages:
+  - stage: Build
+    jobs:
+    - job: BuildTestPackage
+      pool:
+        name: Default
+      steps:
+      - powershell: |
+          .\build\bootstrap.ps1
+        displayName: "Bootstrapping Requirements"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'Init'
+        displayName: "Initiate build"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'AnalyzeFunctions'
+        displayName: "Analyze Module Functions"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'AnalyzeScripts'
+        displayName: "Analyze Module Scripts"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'TestFunctions'
+        displayName: "Test Module Functions"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'StageModule'
+        displayName: "Stage the Module Files"
+
+      - powershell: |
+          .\build\build.ps1 -Tasklist 'UpdateDocumentation'
+        displayName: "Update Documentation"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'CreateModuleZip'
+        displayName: "Create Module Zip File"
+
+      - task: PublishTestResults@2
+        displayName: "Publish Pester Tests"
+        inputs:
+          testRunner: "NUnit"
+          testResultsFiles: '$(Common.TestResultsDirectory)/*.xml'
+          testRunTitle: "$(Build.Repository.Name)-$(Build.SourceBranchName)-PesterTests"
+        condition: always()
+
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Artifact"
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: DevBuildArtifacts
+        condition: always()
+
+    - job: BuildReleasePackage
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+      pool:
+        name: Default
+      steps:
+      - powershell: |
+          .\build\bootstrap.ps1
+        displayName: "Bootstrapping Requirements"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'Init'
+        displayName: "Initiate build"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'StageModule'
+        displayName: "Stage the Module Files"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'CreateModuleZip'
+        displayName: "Create Module Zip File"
+
+      - task: NuGetToolInstaller@1
+        displayName: 'NuGet - Check NuGet Version'
+        inputs:
+          versionSpec: 5.4.0
+          checkLatest: false
+
+      - task: NuGetCommand@2
+        displayName: 'NuGet - Package Release Module'
+        inputs:
+          command: pack
+          packagesToPack: '$(Build.ArtifactStagingDirectory)/**/*.nuspec'
+          packDestination: '$(Build.ArtifactStagingDirectory)'
+          toolPackage: true
+          versioningScheme: off
+
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Artifact"
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: ReleaseBuildArtifacts
+        condition: always()

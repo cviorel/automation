@@ -1,0 +1,178 @@
+# Build & Test Pipeline
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - dev
+      - master
+
+variables:
+- group: "DSC Credentials"
+- group: "DSC Testing Machines"
+- group: "ADO Pipeline WINRM Creds"
+
+stages:
+  - stage: BuildandUnitTests
+    pool:
+      name: Default
+    jobs:
+    - job: Setup
+      steps:
+      - powershell: |
+          .\build\bootstrap.ps1
+        displayName: "Bootstrapping Requirements"
+      - powershell: |
+          .\build\build.ps1 -TaskList 'Init'
+        displayName: "Initiate build"
+
+    - job: UnitTests
+      steps:
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestUtilityFunctions'
+        displayName: "Unit Test - Functions"
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestUtilityScripts'
+        displayName: "Unit Test - Utility Scripts"
+      - powershell: |
+          .\build\CompileMOFs.ps1 -SourcePath "$(Build.SourcesDirectory)\src\configurations" -Destination "$(Build.SourcesDirectory)\src\configurations\compiled"
+        displayName: "Compile MOFs & Create Checksums"
+        env:
+          SQL_SERVICE_NAME_MAPPED: $(SQLServiceAccountName)
+          SQL_SERVICE_PWD_MAPPED: $(SQLServiceAccountPassword)
+          LocalAdmin_Name: $(LocalAdminName)
+          LocalGuest_Name: $(LocalGuestName)
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestConfigScripts'
+        displayName: "Unit Test - Config Scripts"
+
+    - job: Stage
+      steps:
+      - powershell: |
+          .\build\build.ps1 -TaskList 'StageModule'
+        displayName: "Stage the Module Files"
+      - task: ArchiveFiles@2
+        displayName: "ZIP SQL Query Scripts"
+        inputs:
+          rootFolderOrFile: '$(Build.SourcesDirectory)/src/configurations/SQLQueries'
+          archiveType: zip
+          archiveFile: '$(Build.ArtifactStagingDirectory)/tools/SQLQueries.zip'
+          replaceExistingArchive: true
+          verbose: true
+      - powershell: |
+          .\build\build.ps1 -Tasklist 'UpdateDocumentation'
+        displayName: "Update Documentation"
+      - powershell: |
+          .\build\build.ps1 -TaskList 'CreateModuleZip'
+        displayName: "Create Module Zip File"
+
+    - job: Publish
+      steps:
+      - task: PublishTestResults@2
+        displayName: "Publish Test Results"
+        inputs:
+          testRunner: "NUnit"
+          testResultsFiles: '$(Common.TestResultsDirectory)/*.xml'
+          testRunTitle: "$(Build.Repository.Name)-$(Build.SourceBranchName)-UnitTests"
+        condition: always()
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Artifacts"
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: UnitTestBuildArtifacts
+        condition: always()
+
+  - stage: IntegrationTests
+    condition: and(succeeded('BuildandUnitTests'), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+    dependsOn: BuildandUnitTests
+    pool:
+      name: Default
+    jobs:
+    - job: SetupPullServer
+      steps:
+      - task: DownloadBuildArtifacts@0
+        displayName: "Download Build Artifacts"
+        inputs:
+          buildType: current
+          downloadPath: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'DevBuildArtifacts'
+      - task: WindowsMachineFileCopy@2
+        displayName: "Copy Artifacts to Test Pull Server"
+        inputs:
+          MachineNames: $(DSCPullServer-Test)
+          AdminUserName: $(adodevUser)
+          AdminPassword: $(adodevPwd)
+          SourcePath: '$(Build.ArtifactStagingDirectory)/DevBuildArtifacts'
+          TargetPath: 'C:\Temp\DSC'
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Archive current MOFs & checksums"
+        inputs:
+          machines: $(DSCPullServer-Test)
+          UserName: $(adodevUser)
+          UserPassword: $(adodevPwd)
+          ScriptType: Inline
+          InlineScript: 'Compress-Archive -Path $env:ProgramFiles\WindowsPowershell\DscService\Configuration\* -DestinationPath "C:\Temp\DSC\mofarchive.zip" -Force -Verbose'
+      - task: WindowsMachineFileCopy@2
+        displayName: "Copy new MOFs & checksums to DSC root folder"
+        inputs:
+          MachineNames: $(DSCPullServer-Test)
+          AdminUserName: $(adodevUser)
+          AdminPassword: $(adodevPwd)
+          SourcePath: '$(Build.ArtifactStagingDirectory)/DevBuildArtifacts/tools/DSC/configurations/compiled'
+          TargetPath: 'C:\Program Files\WindowsPowerShell\DscService\Configuration\'
+
+    - job: SetupClientNodes
+      steps:
+      - powershell: |
+          .\scripts\Testing\DeploymentScriptGoesHere.ps1
+        displayName: "Deploy Test Client Node 01"
+      - powershell: |
+          .\scripts\Testing\DeploymentScriptGoesHere.ps1
+        displayName: "Deploy Test Client Node 02"
+      - powershell: |
+          .\scripts\Testing\DeploymentScriptGoesHere.ps1
+        displayName: "Deploy Test Client Node 03"
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Configure Test Client Node 01 LCM (No App)"
+        inputs:
+          machines: $(DSCPullServer-Test)
+          UserName: $(adodevUser)
+          UserPassword: $(adodevPwd)
+          ScriptType: FilePath
+          ScriptPath: 'C:\Temp\DSC\tools\DSC\scripts\LCMConfiguration.ps1'
+          ScriptArguments: '-ComputerName $(TestClient01) -PullServerName $(DSCPullServer-Test) -RegKey $(DSCRegKey) -Verbose'
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Configure Test Client Node 02 LCM (IIS)"
+        inputs:
+          machines: $(DSCPullServer-Test)
+          UserName: $(adodevUser)
+          UserPassword: $(adodevPwd)
+          ScriptType: FilePath
+          ScriptPath: 'C:\Temp\DSC\tools\DSC\scripts\LCMConfiguration.ps1'
+          ScriptArguments: '-ComputerName $(TestClient02) -PullServerName $(DSCPullServer-Test) -RegKey $(DSCRegKey) -ApplicationType IIS -Verbose'
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Configure Test Client Node 03 LCM (SQL)"
+        inputs:
+          machines: $(DSCPullServer-Test)
+          UserName: $(adodevUser)
+          UserPassword: $(adodevPwd)
+          ScriptType: FilePath
+          ScriptPath: 'C:\Temp\DSC\tools\DSC\scripts\LCMConfiguration.ps1'
+          ScriptArguments: '-ComputerName $(TestClient03) -PullServerName $(DSCPullServer-Test) -RegKey $(DSCRegKey) -ApplicationType SQL -Verbose'
+
+    - job: IntegrationTesting
+      steps:
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Integration Tests for Local Accounts"
+        inputs:
+          Machines:
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Integration Tests for Application Configuration"
+        inputs:
+          Machines:
+      - task: PowerShellOnTargetMachines@3
+        displayName: "Integration Tests for DSC"
+        inputs:
+          Machines:
+      - task: PublishTestResults@2
+        displayName: "Publish Test Results"

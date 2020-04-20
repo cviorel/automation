@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>dsc</id>
+    <title>DSC Configuration and Utility Module</title>
+    <version>0.0.2</version>
+    <authors>Mike Nickerson</authors>
+    <owners>Mike Nickerson</owners>
+    <summary>Various functions and scripts for managing and using Desired State Configuration (DSC).</summary>
+    <description>This module package contains useful functions and ready-made scripts for managing and using DSC. Various multi-step processes can be made easier and automated with this module.</description>
+    <iconUrl>https://dsccommunity.org/images/DSC_Logo_300p.png</iconUrl>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>
+[0.0.2]
+
+- Reorganizing SQL queries.
+- Set up task in pipeline to ZIP and deploy SQL queries for later download to clients.
+- Updated documentation.
+- Change the publish modules function to a script.
+- Added compiled configs to the repo.
+- Added more firewall rules to the WindowsBaseOS config.
+
+[0.0.1]
+
+- Initial release
+    </releaseNotes>
+    <copyright>Copyright 2020 Mike Nickerson</copyright>
+    <tags>DSC Desired State Configuration Module PowerShell Utility</tags>
+  </metadata>
+</package>

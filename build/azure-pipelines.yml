@@ -1,0 +1,202 @@
+# Build & Test Pipeline
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - dev
+      - master
+
+variables:
+- group: "Automation Pipeline Variables"
+- group: "ADO Pipeline WINRM Creds"
+
+stages:
+  - stage: Build
+    variables:
+          ArtifactName: 'UnitTestBuildArtifacts'
+    jobs:
+    - job: UnitTests
+      condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI', 'Manual'))
+      steps:
+      - powershell: |
+          .\build\bootstrap.ps1
+        displayName: "Bootstrapping Pipeline Requirements"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'Init'
+        displayName: "Initiate Build"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestUtilityFunctions'
+        displayName: "Unit Tests - Functions"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestUtilityScripts'
+        displayName: "Unit Tests - Utility Scripts"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestDeployScripts'
+        displayName: "Unit Tests - VM Deployment Scripts"
+
+      - powershell: |
+          .\build\CompileMOFs.ps1 -SourcePath "$(Build.SourcesDirectory)\src\configurations" -Destination "$(Build.SourcesDirectory)\src\configurations\compiled" -AdminName $(LocalAdminName) -GuestName $(LocalGuestName)
+        displayName: "Compile MOFs & Create Checksums"
+        env:
+          SQL_SERVICE_PWD: $(SQLServiceAccountPassword)
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'UnitTestConfigScripts'
+        displayName: "Unit Test - Config Scripts"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'Init','StageModule'
+        displayName: "Stage the Module Files"
+
+      - task: ArchiveFiles@2
+        displayName: "ZIP SQL Query Scripts"
+        inputs:
+          rootFolderOrFile: '$(Build.SourcesDirectory)/src/configurations/SQLQueries'
+          archiveType: zip
+          archiveFile: '$(Build.ArtifactStagingDirectory)/tools/SQLQueries.zip'
+          replaceExistingArchive: true
+          verbose: true
+
+      - powershell: |
+          .\build\build.ps1 -Tasklist 'UpdateDocumentation'
+        displayName: "Update Documentation"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'CreateModuleZip'
+        displayName: "Create Module Zip File"
+
+      - task: PublishTestResults@2
+        displayName: "Publish Unit Test Results"
+        inputs:
+          testRunner: "NUnit"
+          testResultsFiles: '$(Common.TestResultsDirectory)/*.xml'
+          testRunTitle: "$(Build.Repository.Name)-$(Build.SourceBranchName)-UnitTests"
+        condition: always()
+
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Artifacts"
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: $(ArtifactName)
+        condition: always()
+
+    - job: SetupPullServer
+      dependsOn: UnitTests
+      steps:
+      - task: DownloadBuildArtifacts@0
+        displayName: "Download Build Artifacts"
+        inputs:
+          buildType: current
+          downloadPath: '$(Build.ArtifactStagingDirectory)'
+          artifactName: $(ArtifactName)
+
+      - task: WindowsMachineFileCopy@2
+        displayName: "Copy Artifacts to the $(DSCPullServerTest)"
+        inputs:
+          MachineNames: $(DSCPullServerTest)
+          AdminUserName: $(adodevUser)
+          AdminPassword: $(adodevPwd)
+          SourcePath: '$(Build.ArtifactStagingDirectory)/$(ArtifactName)'
+          TargetPath: 'C:\Temp\DSC'
+
+      - task: ArchiveFiles@2
+        displayName: "Archive current MOFs & checksums"
+        inputs:
+          rootFolderOrFile: $(ConfigRootTestServer)
+          archiveType: zip
+          archiveFile: $(ConfigZIPTestServer)
+          replaceExistingArchive: true
+          verbose: true
+
+      - task: WindowsMachineFileCopy@2
+        displayName: "Copy new MOFs & checksums to DSC root folder"
+        inputs:
+          MachineNames: $(DSCPullServerTest)
+          AdminUserName: $(adodevUser)
+          AdminPassword: $(adodevPwd)
+          SourcePath: '$(Build.ArtifactStagingDirectory)/$(ArtifactName)/tools/Automation/configurations/compiled'
+          TargetPath: 'C:\Program Files\WindowsPowerShell\DscService\Configuration\'
+
+    - job: SetupClientNodes
+      dependsOn: SetupPullServer
+      steps:
+      - powershell: |
+          .\src\scripts\VMDeployment\Automated\AutoDeploy.ps1 -VMMServerName $(VMMServer) -ServerType SQL -GuestOS "Windows Server 2019 Standard" -UI "CORE" -HardwareProfile "Hardware_Profile_2vCPU_8GB" -VMName $(DSCClient01)
+        displayName: "Deploy Test Client: $(DSCClient01)"
+        env:
+          VMMADMIN_PWD: $(VMMAdminPwd)
+          ADODev_PWD: $(adodevPwd)
+
+      - powershell: |
+          .\src\scripts\VMDeployment\Automated\AutoConfig.ps1 -ServerType SQL -GuestOS "Windows Server 2019 Standard" -UI "CORE" -HardwareProfile "Hardware_Profile_2vCPU_8GB" -AdminName $(LocalAdminName) -GuestName $(LocalGuestName) -VMName $(DSCClient01) -DSCPullServer $(DSCPullServerTest) -DSCRegKey $(RegKey-Test) -RepoURL1 $(RepoURL1) -RepoName1 $(RepoName1) -RepoURL2 $(RepoURL2) -RepoName2 $(RepoName2)
+        displayName: "Config Test Client: $(DSCClient01)"
+        env:
+          LOCALADMIN_PWD: $(LocalAdminPassword)
+          LOCALGUEST_PWD: $(LocalGuestPassword)
+          ADODev_PWD: $(adodevPwd)
+          AGENT_PAT: $(AgentPAT)
+
+      - powershell: |
+          .\src\scripts\VMDeployment\Automated\AutoDeploy.ps1 -VMMServerName $(VMMServer) -ServerType IIS -GuestOS "Windows Server 2019 Standard" -UI "CORE" -HardwareProfile "Hardware_Profile_2vCPU_8GB" -VMName $(DSCClient02)
+        displayName: "Deploy Test Client: $(DSCClient02)"
+        env:
+          VMMADMIN_PWD: $(VMMAdminPwd)
+          ADODev_PWD: $(adodevPwd)
+
+      - powershell: |
+          .\src\scripts\VMDeployment\Automated\AutoConfig.ps1 -ServerType IIS -GuestOS "Windows Server 2019 Standard" -UI "CORE" -HardwareProfile "Hardware_Profile_2vCPU_8GB" -AdminName $(LocalAdminName) -GuestName $(LocalGuestName) -VMName $(DSCClient02) -DSCPullServer $(DSCPullServerTest) -DSCRegKey $(RegKey-Test) -RepoURL1 $(RepoURL1) -RepoName1 $(RepoName1) -RepoURL2 $(RepoURL2) -RepoName2 $(RepoName2)
+        displayName: "Config Test Client: $(DSCClient02)"
+        env:
+          LOCALADMIN_PWD: $(LocalAdminPassword)
+          LOCALGUEST_PWD: $(LocalGuestPassword)
+          ADODev_PWD: $(adodevPwd)
+          AGENT_PAT: $(AgentPAT)
+
+      - powershell: |
+          .\src\scripts\VMDeployment\Automated\AutoDeploy.ps1 -VMMServerName $(VMMServer) -GuestOS "Windows Server 2019 Standard" -UI "CORE" -HardwareProfile "Hardware_Profile_2vCPU_8GB" -AdminName $(LocalAdminName) -GuestName $(LocalGuestName) -VMName $(DSCClient03)
+        displayName: "Deploy Test Client: $(DSCClient03)"
+        env:
+          VMMADMIN_PWD: $(VMMAdminPwd)
+          ADODev_PWD: $(adodevPwd)
+
+      - powershell: |
+          .\src\scripts\VMDeployment\Automated\AutoConfig.ps1 -GuestOS "Windows Server 2019 Standard" -UI "CORE" -HardwareProfile "Hardware_Profile_2vCPU_8GB" -AdminName $(LocalAdminName) -GuestName $(LocalGuestName) -VMName $(DSCClient03) -DSCPullServer $(DSCPullServerTest) -DSCRegKey $(RegKey-Test) -RepoURL1 $(RepoURL1) -RepoName1 $(RepoName1) -RepoURL2 $(RepoURL2) -RepoName2 $(RepoName2)
+        displayName: "Config Test Client: $(DSCClient03)"
+        env:
+          LOCALADMIN_PWD: $(LocalAdminPassword)
+          LOCALGUEST_PWD: $(LocalGuestPassword)
+          ADODev_PWD: $(adodevPwd)
+          AGENT_PAT: $(AgentPAT)
+
+    - job: IntegrationTesting
+      dependsOn: SetupClientNodes
+      steps:
+      - powershell: |
+          .\build\build.ps1 -TaskList 'InTestVMProps'
+        displayName: "Integration Tests - VM Properties"
+
+      - powershell: |
+          .\build\build.ps1 -TaskList 'InDSCTesting'
+        displayName: "Integration Tests - DSC Configurations"
+
+    - job: PublishIntegrationTestResults
+      dependsOn: IntegrationTesting
+      steps:
+      - task: PublishTestResults@2
+        displayName: "Publish Integration Test Results"
+        inputs:
+          testRunner: "NUnit"
+          testResultsFiles: '$(Common.TestResultsDirectory)/*.xml'
+          testRunTitle: "$(Build.Repository.Name)-$(Build.SourceBranchName)-IntegrationTests"
+        condition: always()
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Artifacts"
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: IntegrationTestBuildArtifacts
+        condition: always()

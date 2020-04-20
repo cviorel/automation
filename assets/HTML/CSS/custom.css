@@ -1,0 +1,28 @@
+/*Top bar css */
+.top_bar .logo {
+	font-size: 1.67em;
+	font-weight: 600;
+	height: 100%;
+    margin-left: 1em;
+    padding-top: 0.33em;
+    max-width:20em;
+}
+
+.top_bar .company_logo {
+    padding-top: 0.5em;
+    margin-left: 1em;
+    max-width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.top_bar {
+    background: #aeb0b5;
+    color: #205493;
+    width: calc(100% - 4em );
+    height: 4em;
+    float: left;
+    position: fixed;
+    z-index: 1000;
+    margin-left: 4em;
+}
